@@ -25,8 +25,21 @@ namespace Sitecore.Support.Commerce.Pipelines.Customers.GetUser
       Assert.ArgumentCondition(args.Request is GetUserRequest, "args.Request", "args.Request is GetUserRequest");
       Assert.ArgumentCondition(args.Result is GetUserResult, "args.Result", "args.Result is GetUserResult");
       GetUserRequest request = (GetUserRequest)args.Request;
-      Assert.IsNotNullOrEmpty(request.UserName, "request.UserName");
-      ((GetUserResult)args.Result).CommerceUser = base.UserRepository.Get(request.UserName);
+
+      #region Fix 326630
+      string userName;
+      if (!string.IsNullOrEmpty(request.UserName))
+      {
+        userName = request.UserName;
+      }
+      else
+      {
+        userName = request.ExternalId;
+      }
+      Assert.IsNotNullOrEmpty(userName, "userName");
+      #endregion
+
+      ((GetUserResult)args.Result).CommerceUser = base.UserRepository.Get(userName);
     }
 
   }
